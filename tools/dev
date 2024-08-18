@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd "$( dirname "${BASH_SOURCE[0]}" )"
+
+# If this fails, you may need to install global packages using:
+#  - `npm i -g concurrently`
+concurrently -k -c auto -n PROXY,BACKEND "bash ./dev-proxy/start" "bash ./../backend/tools/dev"

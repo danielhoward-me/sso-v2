@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd "$( dirname "${BASH_SOURCE[0]}" )"
+
+jet -dsn=postgresql://sso:sso@local.danielhoward.me:5432/sso?sslmode=disable -schema=public -path=./.gen
+
+echo "Moving generated files to db/schema"
+rm -rf ./../db/schema
+mv ./.gen/sso/public ./../db/schema
+rm -rf ./.gen
