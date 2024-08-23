@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/danielhoward-me/sso/backend/oauth2"
+	"github.com/danielhoward-me/sso-v2/backend/oauth2"
 )
 
 func createGinEngine() *gin.Engine {
@@ -18,8 +18,12 @@ func createGinEngine() *gin.Engine {
 		engine.Use(gin.Logger())
 	}
 
-	// The nginx proxy only forwards requests if they start with "/api", otherwise
+	// The nginx proxy only forwards requests if they start with "/api" or equal "/logout", otherwise
 	// they are sent to the frontend
+	engine.GET("/logout", func(c *gin.Context) {
+
+	})
+
 	apiRouter := engine.Group("/api")
 	setupApiRouter(apiRouter)
 
@@ -28,7 +32,11 @@ func createGinEngine() *gin.Engine {
 	return engine
 }
 
+// Any validation errors for all endpoints should be caught and handled by the OpenAPI validator, therefore
+// any if any validation errors are detected, they should panic instead
 func setupApiRouter(router *gin.RouterGroup) {
+	router.POST("/oauth2/token", handleTokenEndpoint)
+
 	router.GET("/admin/clients", func(c *gin.Context) {
 		clients := oauth2.GetAllClients()
 

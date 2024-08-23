@@ -7,18 +7,19 @@ import (
 	. "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
+	"github.com/matthewhartstonge/argon2"
 
-	"github.com/danielhoward-me/sso/backend/db"
-	"github.com/danielhoward-me/sso/backend/db/schema/model"
-	. "github.com/danielhoward-me/sso/backend/db/schema/table"
+	"github.com/danielhoward-me/sso-v2/backend/db"
+	"github.com/danielhoward-me/sso-v2/backend/db/schema/model"
+	. "github.com/danielhoward-me/sso-v2/backend/db/schema/table"
 )
 
 type Client struct {
-	ID                     uuid.UUID
-	Name                   string
-	Secret                 string
-	ShowConfirmationPrompt bool
-	Redirects              []string
+	id                     uuid.UUID
+	name                   string
+	secret                 string
+	showConfirmationPrompt bool
+	redirects              []string
 }
 
 type rawClientData struct {
@@ -70,14 +71,14 @@ func NewClient(id uuid.UUID) (client Client, exists bool) {
 }
 
 func processRawClient(rawClient rawClientData) (client Client) {
-	client.ID = rawClient.ID
-	client.Name = rawClient.Name
-	client.Secret = rawClient.Secret
-	client.ShowConfirmationPrompt = rawClient.ShowConfirmationPrompt
+	client.id = rawClient.ID
+	client.name = rawClient.Name
+	client.secret = rawClient.Secret
+	client.showConfirmationPrompt = rawClient.ShowConfirmationPrompt
 
-	client.Redirects = []string{}
+	client.redirects = []string{}
 	for _, redirect := range rawClient.ClientRedirects {
-		client.Redirects = append(client.Redirects, redirect.Redirect)
+		client.redirects = append(client.redirects, redirect.Redirect)
 	}
 
 	return
@@ -85,22 +86,32 @@ func processRawClient(rawClient rawClientData) (client Client) {
 
 func (client *Client) ToMap() map[string]any {
 	return map[string]any{
-		"id":                     client.ID,
-		"name":                   client.Name,
-		"showConfirmationPrompt": client.ShowConfirmationPrompt,
-		"redirects":              client.Redirects,
+		"id":                     client.id,
+		"name":                   client.name,
+		"showConfirmationPrompt": client.showConfirmationPrompt,
+		"redirects":              client.redirects,
 	}
+}
+
+func (client *Client) CheckSecret(secret string) bool {
+	matches, err := argon2.VerifyEncoded([]byte(secret), []byte(client.secret))
+	if err != nil {
+		// Errors occur when the secrect hasn't been encoded properly so
+		// authentication should just fail
+		return false
+	}
+	return matches
 }
 
 func (client *Client) UpdateName(name string) {
 	_, err := Clients.UPDATE(Clients.Name).
 		MODEL(model.Clients{Name: name}).
-		WHERE(Clients.ID.EQ(UUID(client.ID))).
+		WHERE(Clients.ID.EQ(UUID(client.id))).
 		Exec(db.DB)
 
 	if err != nil {
-		panic(fmt.Errorf("error occured when updating the name of client with ID '%s': %s", client.ID.String(), err))
+		panic(fmt.Errorf("error occured when updating the name of client with ID '%s': %s", client.id.String(), err))
 	}
 
-	client.Name = name
+	client.name = name
 }

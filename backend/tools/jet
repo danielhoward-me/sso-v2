@@ -2,6 +2,12 @@
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
+if ! command -v jet &> /dev/null
+then
+    echo "jet generator could not be found, installing..."
+    go install github.com/go-jet/jet/v2/cmd/jet@latest
+fi
+
 jet -dsn=postgresql://sso:sso@local.danielhoward.me:5432/sso?sslmode=disable -schema=public -path=./.gen
 
 echo "Moving generated files to db/schema"

@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/danielhoward-me/sso/backend/db"
-	"github.com/danielhoward-me/sso/backend/utils"
+	"github.com/danielhoward-me/sso-v2/backend/db"
+	"github.com/danielhoward-me/sso-v2/backend/utils"
 )
 
 var PORT = utils.GetEnv("PORT", "3001")

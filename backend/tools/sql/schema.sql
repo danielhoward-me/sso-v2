@@ -12,7 +12,7 @@ CREATE TABLE users (
 	id UUID NOT NULL PRIMARY KEY,
 	username TEXT NOT NULL UNIQUE,
 	password TEXT NOT NULL,
-	email VARCHAR(256) NOT NULL UNIQUE,
+	email TEXT NOT NULL UNIQUE,
 	profile_picture profile_picture NOT NULL DEFAULT 'wavatar',
 	created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -29,4 +29,22 @@ CREATE TABLE client_redirects (
 	client_id UUID NOT NULL REFERENCES clients(id),
 	redirect TEXT NOT NULL,
 	PRIMARY KEY (client_id, redirect)
+);
+
+CREATE TABLE authorisation_codes (
+	code TEXT NOT NULL PRIMARY KEY,
+	client_id UUID NOT NULL REFERENCES clients(id),
+	user_id UUID NOT NULL REFERENCES users(id),
+	redirect_uri TEXT NOT NULL,
+	created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	expires TIMESTAMP NOT NULL
+);
+
+CREATE TABLE access_tokens (
+	token TEXT NOT NULL PRIMARY KEY,
+	client_id UUID NOT NULL REFERENCES clients(id),
+	user_id UUID NOT NULL REFERENCES users(id),
+	created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	expires TIMESTAMP NOT NULL,
+	last_used TIMESTAMP
 );
