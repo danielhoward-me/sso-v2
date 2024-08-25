@@ -11,7 +11,7 @@ package table
 // this method only once at the beginning of the program.
 func UseSchema(schema string) {
 	AccessTokens = AccessTokens.FromSchema(schema)
-	AuthorisationCodes = AuthorisationCodes.FromSchema(schema)
+	AuthCodes = AuthCodes.FromSchema(schema)
 	ClientRedirects = ClientRedirects.FromSchema(schema)
 	Clients = Clients.FromSchema(schema)
 	Users = Users.FromSchema(schema)

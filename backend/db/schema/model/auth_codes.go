@@ -12,9 +12,11 @@ import (
 	"time"
 )
 
-type AuthorisationCodes struct {
-	Code     string `sql:"primary_key"`
-	ClientID uuid.UUID
-	UserID   uuid.UUID
-	Created  time.Time
+type AuthCodes struct {
+	Code        string `sql:"primary_key"`
+	ClientID    uuid.UUID
+	UserID      uuid.UUID
+	RedirectURI string
+	Created     time.Time
+	Expires     time.Time
 }

@@ -18,7 +18,7 @@ func createGinEngine() *gin.Engine {
 		engine.Use(gin.Logger())
 	}
 
-	// The nginx proxy only forwards requests if they start with "/api" or equal "/logout", otherwise
+	// The nginx proxy only forwards requests if they start with "/api" or are equal to "/logout", otherwise
 	// they are sent to the frontend
 	engine.GET("/logout", func(c *gin.Context) {
 
@@ -51,14 +51,17 @@ func setupApiRouter(router *gin.RouterGroup) {
 	router.GET("/admin/clients/:id", func(c *gin.Context) {
 		id := c.Param("id")
 		name := c.Query("name")
+		scp := c.Query("scp") == "1"
 
 		client, _ := oauth2.NewClient(uuid.MustParse(id))
 		client.UpdateName(name)
+		client.UpdateShowConfirmationPrompt(scp)
 	})
 }
 
-func recoveryHandler(c *gin.Context, _ any) {
+func recoveryHandler(c *gin.Context, err any) {
 	handleError(http.StatusInternalServerError, c)
+	alert(err)
 }
 
 func noRouteHandler(c *gin.Context) {

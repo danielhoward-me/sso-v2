@@ -17,5 +17,6 @@ type AccessTokens struct {
 	ClientID uuid.UUID
 	UserID   uuid.UUID
 	Created  time.Time
+	Expires  time.Time
 	LastUsed *time.Time
 }

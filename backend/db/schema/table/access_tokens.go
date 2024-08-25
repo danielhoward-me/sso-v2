@@ -21,6 +21,7 @@ type accessTokensTable struct {
 	ClientID postgres.ColumnString
 	UserID   postgres.ColumnString
 	Created  postgres.ColumnTimestamp
+	Expires  postgres.ColumnTimestamp
 	LastUsed postgres.ColumnTimestamp
 
 	AllColumns     postgres.ColumnList
@@ -66,9 +67,10 @@ func newAccessTokensTableImpl(schemaName, tableName, alias string) accessTokensT
 		ClientIDColumn = postgres.StringColumn("client_id")
 		UserIDColumn   = postgres.StringColumn("user_id")
 		CreatedColumn  = postgres.TimestampColumn("created")
+		ExpiresColumn  = postgres.TimestampColumn("expires")
 		LastUsedColumn = postgres.TimestampColumn("last_used")
-		allColumns     = postgres.ColumnList{TokenColumn, ClientIDColumn, UserIDColumn, CreatedColumn, LastUsedColumn}
-		mutableColumns = postgres.ColumnList{ClientIDColumn, UserIDColumn, CreatedColumn, LastUsedColumn}
+		allColumns     = postgres.ColumnList{TokenColumn, ClientIDColumn, UserIDColumn, CreatedColumn, ExpiresColumn, LastUsedColumn}
+		mutableColumns = postgres.ColumnList{ClientIDColumn, UserIDColumn, CreatedColumn, ExpiresColumn, LastUsedColumn}
 	)
 
 	return accessTokensTable{
@@ -79,6 +81,7 @@ func newAccessTokensTableImpl(schemaName, tableName, alias string) accessTokensT
 		ClientID: ClientIDColumn,
 		UserID:   UserIDColumn,
 		Created:  CreatedColumn,
+		Expires:  ExpiresColumn,
 		LastUsed: LastUsedColumn,
 
 		AllColumns:     allColumns,

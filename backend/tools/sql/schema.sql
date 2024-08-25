@@ -31,7 +31,7 @@ CREATE TABLE client_redirects (
 	PRIMARY KEY (client_id, redirect)
 );
 
-CREATE TABLE authorisation_codes (
+CREATE TABLE auth_codes (
 	code TEXT NOT NULL PRIMARY KEY,
 	client_id UUID NOT NULL REFERENCES clients(id),
 	user_id UUID NOT NULL REFERENCES users(id),

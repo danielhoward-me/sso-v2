@@ -11,6 +11,7 @@ var PORT = utils.GetEnv("PORT", "3001")
 
 func main() {
 	db.Connect()
+	createAlertSender()
 
 	r := createGinEngine()
 	r.Run(fmt.Sprintf(":%s", PORT))

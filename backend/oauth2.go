@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/danielhoward-me/sso-v2/backend/oauth2"
+	"github.com/danielhoward-me/sso-v2/backend/utils"
 )
 
 type TokenEndpointBodyBase struct {
@@ -51,9 +52,14 @@ func handleTokenEndpoint(c *gin.Context) {
 		panic(fmt.Errorf("token endpoint was passed an invalid client id: %s", err))
 	}
 
-	client, exists := oauth2.NewClient(clientUuid)
-	if !exists {
-		c.JSON(401, INVALID_CLIENT_ERROR)
+	client, err := oauth2.NewClient(clientUuid)
+	if err != nil {
+		if utils.ErrIsNoRows(err) {
+			c.JSON(401, INVALID_CLIENT_ERROR)
+			return
+		}
+
+		panic(err)
 	}
 
 	if !client.CheckSecret(clientSecret) {
@@ -65,7 +71,7 @@ func handleTokenEndpoint(c *gin.Context) {
 	switch body.GrantType {
 	case "authorization_code":
 		{
-			fullBody := mustParseBody[TokenEndpointBodyAuthorisationCode](c)
+			// fullBody := mustParseBody[TokenEndpointBodyAuthorisationCode](c)
 		}
 	default:
 		{
