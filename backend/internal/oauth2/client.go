@@ -7,15 +7,16 @@ import (
 	"github.com/google/uuid"
 	"github.com/matthewhartstonge/argon2"
 
-	"github.com/danielhoward-me/sso-v2/backend/db"
-	"github.com/danielhoward-me/sso-v2/backend/db/dbo"
-	"github.com/danielhoward-me/sso-v2/backend/db/schema/model"
-	"github.com/danielhoward-me/sso-v2/backend/db/schema/table"
+	"github.com/danielhoward-me/sso-v2/backend/internal/db"
+	"github.com/danielhoward-me/sso-v2/backend/internal/db/dbo"
+	"github.com/danielhoward-me/sso-v2/backend/internal/db/schema/model"
+	"github.com/danielhoward-me/sso-v2/backend/internal/db/schema/table"
 )
 
 type Client struct {
 	dbo.DBO[model.Clients]
-	id                     uuid.UUID
+	id                     int32
+	uuid                   uuid.UUID
 	name                   string
 	secret                 string
 	showConfirmationPrompt bool
@@ -27,7 +28,7 @@ type rawClientData struct {
 	ClientRedirects []model.ClientRedirects
 }
 
-func makeClient(rawClient rawClientData) *Client {
+func makeClient(rawClient rawClientData) (*Client, int32) {
 	redirects := []string{}
 	for _, redirect := range rawClient.ClientRedirects {
 		redirects = append(redirects, redirect.Redirect)
@@ -35,29 +36,32 @@ func makeClient(rawClient rawClientData) *Client {
 
 	return &Client{
 		id:                     rawClient.ID,
+		uuid:                   rawClient.UUID,
 		name:                   rawClient.Name,
 		secret:                 rawClient.Secret,
 		showConfirmationPrompt: rawClient.ShowConfirmationPrompt,
 		redirects:              redirects,
-	}
+	}, rawClient.ID
 }
 
-var dboHandler = dbo.NewHandler[uuid.UUID, model.Clients](
-	makeClient,
-	table.Clients,
-	table.Clients.LEFT_JOIN(
+var clientDBOHandler = dbo.NewHandler(dbo.DBOHandlerOptions[model.Clients, rawClientData, *Client]{
+	DBOMaker: makeClient,
+	Table:    table.Clients,
+	FetchTable: table.Clients.LEFT_JOIN(
 		table.ClientRedirects,
 		table.Clients.ID.EQ(table.ClientRedirects.ClientID),
 	),
-	table.Clients.ID,
-	[]postgres.Projection{table.Clients.AllColumns, table.ClientRedirects.Redirect},
-)
+	IDColumn:   table.Clients.ID,
+	UUIDColumn: table.Clients.UUID,
+	Columns:    dbo.SelectColumnList{table.Clients.AllColumns, table.ClientRedirects.Redirect},
+})
 
-var NewClient = dboHandler.New
+var NewClient = clientDBOHandler.New
+var NewClientFromUUID = clientDBOHandler.NewFromUUID
 
 func (client Client) ToMap() map[string]any {
 	return map[string]any{
-		"id":                     client.id,
+		"id":                     client.uuid,
 		"name":                   client.name,
 		"showConfirmationPrompt": client.showConfirmationPrompt,
 		"redirects":              client.redirects,
@@ -76,7 +80,7 @@ func (client Client) CheckSecret(secret string) bool {
 
 func (client *Client) UpdateName(name string) (err error) {
 	if err = client.Update(
-		postgres.ColumnList{table.Clients.Name},
+		dbo.UpdateColumnList{table.Clients.Name},
 		model.Clients{Name: name},
 	); err != nil {
 		return
@@ -88,7 +92,7 @@ func (client *Client) UpdateName(name string) (err error) {
 
 func (client *Client) UpdateShowConfirmationPrompt(showConfirmationPrompt bool) (err error) {
 	if err = client.Update(
-		postgres.ColumnList{table.Clients.ShowConfirmationPrompt},
+		dbo.UpdateColumnList{table.Clients.ShowConfirmationPrompt},
 		model.Clients{ShowConfirmationPrompt: showConfirmationPrompt},
 	); err != nil {
 		return
@@ -99,7 +103,9 @@ func (client *Client) UpdateShowConfirmationPrompt(showConfirmationPrompt bool) 
 }
 
 func GetAllClients() (clients []*Client) {
-	var clientIds []struct{ ID uuid.UUID }
+	var clientIds []struct {
+		ID int32 `json:"id"`
+	}
 	err := postgres.SELECT(table.Clients.ID.AS("id")).FROM(table.Clients).Query(db.DB, &clientIds)
 	if err != nil {
 		panic(fmt.Errorf("error occured when fetching all client IDs: %s", err))

@@ -6,7 +6,7 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/danielhoward-me/sso-v2/backend/utils"
+	"github.com/danielhoward-me/sso-v2/backend/internal/utils"
 )
 
 var DB *sql.DB

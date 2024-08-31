@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var DEFAULT_PARAMS = &types.Params{
+var defaultParams = &types.Params{
 	"title": getTitle(),
 }
 
@@ -51,7 +51,7 @@ func alert(err any) {
 	}
 
 	message := fmt.Sprintf("%sInternal server error has occured:\n%s", getDevMessage(), err)
-	alerter.Send(message, DEFAULT_PARAMS)
+	alerter.Send(message, defaultParams)
 }
 
 func getDevMessage() string {

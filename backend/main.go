@@ -3,16 +3,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/danielhoward-me/sso-v2/backend/db"
-	"github.com/danielhoward-me/sso-v2/backend/utils"
+	"github.com/danielhoward-me/sso-v2/backend/app"
+	"github.com/danielhoward-me/sso-v2/backend/internal/utils"
 )
 
 var PORT = utils.GetEnv("PORT", "3001")
 
 func main() {
-	db.Connect()
-	createAlertSender()
-
-	r := createGinEngine()
-	r.Run(fmt.Sprintf(":%s", PORT))
+	server := app.New(fmt.Sprintf(":%s", PORT))
+	server.Start()
 }

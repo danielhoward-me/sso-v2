@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/danielhoward-me/sso-v2/backend/oauth2"
+	"github.com/danielhoward-me/sso-v2/backend/internal/oauth2"
 )
 
 func createGinEngine() *gin.Engine {
@@ -53,7 +53,7 @@ func setupApiRouter(router *gin.RouterGroup) {
 		name := c.Query("name")
 		scp := c.Query("scp") == "1"
 
-		client, _ := oauth2.NewClient(uuid.MustParse(id))
+		client, _ := oauth2.NewClientFromUUID(uuid.MustParse(id))
 		client.UpdateName(name)
 		client.UpdateShowConfirmationPrompt(scp)
 	})
