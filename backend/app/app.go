@@ -1,8 +1,6 @@
 package app
 
-import (
-	"github.com/danielhoward-me/sso-v2/backend/internal/db"
-)
+import "github.com/danielhoward-me/sso-v2/backend/internal/db"
 
 func New(addr string) *App {
 	return &App{
