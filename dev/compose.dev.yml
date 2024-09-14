@@ -19,6 +19,9 @@ services:
       - PGHOST=db
       - PGPORT=5432
       - PGDATABASE=sso
+    env_file:
+      - path: ./../backend/.env
+        required: false
   proxy:
     image: nginx:1.25.2
     ports:
