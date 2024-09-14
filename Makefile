@@ -1,7 +1,7 @@
 dev: # Run the docker development environment
-	docker compose -f ./dev/compose.dev.yml up
+	docker compose -f ./dev/compose.dev.yml up --watch
 dev-build: # Reuild the development containers and run the docker development environment
-	docker compose -f ./dev/compose.dev.yml up --build
+	docker compose -f ./dev/compose.dev.yml up --watch --build
 
 backend-sh: # Run a shell in the backend container
 	docker compose -f ./dev/compose.dev.yml exec backend sh
