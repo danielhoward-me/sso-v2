@@ -1,2 +1,2 @@
 .env
-backend/internal/db/schema
+*.gen.go

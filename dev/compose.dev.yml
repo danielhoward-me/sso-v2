@@ -1,10 +1,26 @@
 version: '3.8'
 
+name: sso-dev
+
 services:
+  backend:
+    depends_on:
+      - db
+    build:
+      context: ./../backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./../backend:/app
+    environment:
+      - PORT=80
+      - GIN_MODE=debug
+      - PGUSER=sso
+      - PGPASSWORD=sso
+      - PGHOST=db
+      - PGPORT=5432
+      - PGDATABASE=sso
   proxy:
     image: nginx:1.25.2
-    extra_hosts:
-      - host.docker.internal:host-gateway
     ports:
       - 80:80
     volumes:
@@ -21,4 +37,4 @@ services:
       - POSTGRES_USER=sso
     volumes:
       - /var/lib/postgresql/data
-      - ./../backend/sql:/docker-entrypoint-initdb.d
+      - ./../backend/internal/db/sql:/docker-entrypoint-initdb.d

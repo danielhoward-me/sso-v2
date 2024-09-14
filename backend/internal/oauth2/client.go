@@ -3,14 +3,13 @@ package oauth2
 import (
 	"fmt"
 
-	"github.com/go-jet/jet/v2/postgres"
-	"github.com/google/uuid"
-	"github.com/matthewhartstonge/argon2"
-
 	"github.com/danielhoward-me/sso-v2/backend/internal/db"
 	"github.com/danielhoward-me/sso-v2/backend/internal/db/dbo"
 	"github.com/danielhoward-me/sso-v2/backend/internal/db/schema/model"
 	"github.com/danielhoward-me/sso-v2/backend/internal/db/schema/table"
+	"github.com/go-jet/jet/v2/postgres"
+	"github.com/google/uuid"
+	"github.com/matthewhartstonge/argon2"
 )
 
 type Client struct {
@@ -59,8 +58,8 @@ var clientDBOHandler = dbo.NewHandler(dbo.DBOHandlerOptions[model.Clients, rawCl
 var NewClient = clientDBOHandler.New
 var NewClientFromUUID = clientDBOHandler.NewFromUUID
 
-func (client Client) ToMap() map[string]any {
-	return map[string]any{
+func (client Client) ToMap() map[string]interface{} {
+	return map[string]interface{}{
 		"id":                     client.uuid,
 		"name":                   client.name,
 		"showConfirmationPrompt": client.showConfirmationPrompt,

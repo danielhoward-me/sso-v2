@@ -3,11 +3,10 @@ package user
 import (
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/danielhoward-me/sso-v2/backend/internal/db/dbo"
 	"github.com/danielhoward-me/sso-v2/backend/internal/db/schema/model"
 	"github.com/danielhoward-me/sso-v2/backend/internal/db/schema/table"
+	"github.com/google/uuid"
 )
 
 type ProfilePicture = model.ProfilePicture

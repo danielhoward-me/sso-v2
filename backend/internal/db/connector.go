@@ -4,9 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/lib/pq"
-
 	"github.com/danielhoward-me/sso-v2/backend/internal/utils"
+	_ "github.com/lib/pq"
 )
 
 var DB *sql.DB

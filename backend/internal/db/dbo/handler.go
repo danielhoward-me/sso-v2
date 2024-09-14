@@ -3,10 +3,9 @@ package dbo
 import (
 	"fmt"
 
+	"github.com/danielhoward-me/sso-v2/backend/internal/db"
 	"github.com/go-jet/jet/v2/postgres"
 	"github.com/google/uuid"
-
-	"github.com/danielhoward-me/sso-v2/backend/internal/db"
 )
 
 type SelectColumnList = []postgres.Projection
