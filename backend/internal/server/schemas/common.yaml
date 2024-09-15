@@ -1,7 +1,22 @@
 components:
   schemas:
+    Error:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
     Client:
       type: object
+      required:
+        - id
+        - name
+        - showConfirmationPrompt
+        - redirects
       properties:
         id:
           type: string

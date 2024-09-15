@@ -1,4 +1,4 @@
-package app
+package alert
 
 import (
 	"fmt"
@@ -7,30 +7,26 @@ import (
 	"github.com/containrrr/shoutrrr"
 	"github.com/containrrr/shoutrrr/pkg/router"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/gin-gonic/gin"
+	"github.com/danielhoward-me/sso-v2/backend/internal/utils"
 )
 
 var defaultParams = &types.Params{
 	"title": getTitle(),
 }
 
-var alerterActive = false
-var alerter *router.ServiceRouter
+type Alerter struct {
+	sender *router.ServiceRouter
+}
 
-func createAlertSender() {
-	alertUrl := os.Getenv("ALERT_URL")
-	if alertUrl == "" {
-		fmt.Println("ALERT_URL env variable isn't set, not alerting on server errors")
+func New(alertUrl string) (alerter *Alerter, err error) {
+	sender, err := shoutrrr.CreateSender(alertUrl)
+	if err != nil {
 		return
 	}
 
-	sender, err := shoutrrr.CreateSender(alertUrl)
-	if err != nil {
-		panic(fmt.Errorf("error when creating shoutrrr sender: %s", err))
-	}
-
-	alerter = sender
-	alerterActive = true
+	return &Alerter{
+		sender: sender,
+	}, nil
 }
 
 func getTitle() string {
@@ -45,17 +41,13 @@ func getTitle() string {
 	return fmt.Sprintf("%s on %s", baseTitle, hostname)
 }
 
-func alert(err any) {
-	if !alerterActive {
-		return
-	}
-
-	message := fmt.Sprintf("%sInternal server error has occured:\n%s", getDevMessage(), err)
-	alerter.Send(message, defaultParams)
+func (alerter *Alerter) Alert(message string) {
+	fullMessage := fmt.Sprintf("%s%s", getDevMessage(), message)
+	alerter.sender.Send(fullMessage, defaultParams)
 }
 
 func getDevMessage() string {
-	if gin.IsDebugging() {
+	if utils.IsDevelopment() {
 		return "DEVELOPMENT MODE\n\n"
 	} else {
 		return ""

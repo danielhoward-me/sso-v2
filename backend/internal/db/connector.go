@@ -2,48 +2,26 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 
-	"github.com/danielhoward-me/sso-v2/backend/internal/utils"
 	_ "github.com/lib/pq"
 )
 
 var DB *sql.DB
 
-var PGUSER = utils.GetEnv("PGUSER")
-var PGPASSWORD = utils.GetEnv("PGPASSWORD")
-var PGHOST = utils.GetEnv("PGHOST")
-var PGPORT = utils.GetEnv("PGPORT", "5432")
-var PGDATABASE = utils.GetEnv("PGDATABASE")
-var PSSSLMODE = utils.GetEnv("PSSSLMODE", "disable")
-
-var CONNECTION_STRING = fmt.Sprintf(
-	"postgres://%s:%s@%s:%s/%s?sslmode=%s",
-	PGUSER,
-	PGPASSWORD,
-	PGHOST,
-	PGPORT,
-	PGDATABASE,
-	PSSSLMODE,
-)
-
-func Connect() {
+func Connect(connectionString string) (err error) {
 	if DB != nil {
 		return
 	}
 
-	fmt.Printf("Connecting to database %s\n", PGDATABASE)
-
-	connection, err := sql.Open("postgres", CONNECTION_STRING)
+	connection, err := sql.Open("postgres", connectionString)
 	if err != nil {
-		panic(fmt.Errorf("failed to create database connection: %s", err))
+		return
 	}
 
 	if err = connection.Ping(); err != nil {
-		panic(fmt.Errorf("failed to ping database: %s", err))
+		return
 	}
 
-	fmt.Printf("Connected to database %s\n", PGDATABASE)
-
 	DB = connection
+	return
 }

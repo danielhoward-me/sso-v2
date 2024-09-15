@@ -1,7 +1,6 @@
 package oauth2
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/danielhoward-me/sso-v2/backend/internal/db/dbo"
@@ -19,10 +18,10 @@ type AccessToken struct {
 	lastUsed     *time.Time
 }
 
-func makeAccessToken(rawAccessToken model.AccessTokens) (*AccessToken, int32) {
+func makeAccessToken(rawAccessToken model.AccessTokens) (accessToken *AccessToken, id int32, err error) {
 	refreshToken, err := NewRefreshToken(rawAccessToken.RefreshTokenID)
 	if err != nil {
-		panic(fmt.Errorf("failed to create client object when making auth code object: %s", err))
+		return
 	}
 
 	return &AccessToken{
@@ -32,7 +31,7 @@ func makeAccessToken(rawAccessToken model.AccessTokens) (*AccessToken, int32) {
 		created:      rawAccessToken.Created,
 		expires:      rawAccessToken.Expires,
 		lastUsed:     rawAccessToken.LastUsed,
-	}, rawAccessToken.ID
+	}, rawAccessToken.ID, nil
 }
 
 var AccessTokenDBOHandler = dbo.NewHandler(dbo.DBOHandlerOptions[model.AccessTokens, model.AccessTokens, *AccessToken]{

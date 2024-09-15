@@ -22,7 +22,7 @@ type User struct {
 	lastUpdated    time.Time
 }
 
-func makeUser(rawUser model.Users) (*User, int32) {
+func makeUser(rawUser model.Users) (*User, int32, error) {
 	return &User{
 		id:             rawUser.ID,
 		uuid:           rawUser.UUID,
@@ -32,7 +32,7 @@ func makeUser(rawUser model.Users) (*User, int32) {
 		profilePicture: rawUser.ProfilePicture,
 		created:        rawUser.Created,
 		lastUpdated:    rawUser.LastUpdated,
-	}, rawUser.ID
+	}, rawUser.ID, nil
 }
 
 var dboHandler = dbo.NewHandler(dbo.DBOHandlerOptions[model.Users, model.Users, *User]{

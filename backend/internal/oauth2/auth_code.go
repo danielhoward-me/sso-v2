@@ -1,7 +1,6 @@
 package oauth2
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/danielhoward-me/sso-v2/backend/internal/db/dbo"
@@ -21,15 +20,15 @@ type AuthCode struct {
 	expires     time.Time
 }
 
-func makeAuthCode(rawAuthCode model.AuthCodes) (*AuthCode, int32) {
+func makeAuthCode(rawAuthCode model.AuthCodes) (authCode *AuthCode, id int32, err error) {
 	client, err := NewClient(rawAuthCode.ClientID)
 	if err != nil {
-		panic(fmt.Errorf("failed to create client object when making auth code object: %s", err))
+		return
 	}
 
 	user, err := user.New(rawAuthCode.UserID)
 	if err != nil {
-		panic(fmt.Errorf("failed to create user object when making auth code object: %s", err))
+		return
 	}
 
 	return &AuthCode{
@@ -40,7 +39,7 @@ func makeAuthCode(rawAuthCode model.AuthCodes) (*AuthCode, int32) {
 		redirectUri: rawAuthCode.RedirectURI,
 		created:     rawAuthCode.Created,
 		expires:     rawAuthCode.Expires,
-	}, rawAuthCode.ID
+	}, rawAuthCode.ID, nil
 }
 
 var authCodeDBOHandler = dbo.NewHandler(dbo.DBOHandlerOptions[model.AuthCodes, model.AuthCodes, *AuthCode]{

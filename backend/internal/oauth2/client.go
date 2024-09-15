@@ -1,8 +1,6 @@
 package oauth2
 
 import (
-	"fmt"
-
 	"github.com/danielhoward-me/sso-v2/backend/internal/db"
 	"github.com/danielhoward-me/sso-v2/backend/internal/db/dbo"
 	"github.com/danielhoward-me/sso-v2/backend/internal/db/schema/model"
@@ -27,7 +25,7 @@ type rawClientData struct {
 	ClientRedirects []model.ClientRedirects
 }
 
-func makeClient(rawClient rawClientData) (*Client, int32) {
+func makeClient(rawClient rawClientData) (*Client, int32, error) {
 	redirects := []string{}
 	for _, redirect := range rawClient.ClientRedirects {
 		redirects = append(redirects, redirect.Redirect)
@@ -40,7 +38,7 @@ func makeClient(rawClient rawClientData) (*Client, int32) {
 		secret:                 rawClient.Secret,
 		showConfirmationPrompt: rawClient.ShowConfirmationPrompt,
 		redirects:              redirects,
-	}, rawClient.ID
+	}, rawClient.ID, nil
 }
 
 var clientDBOHandler = dbo.NewHandler(dbo.DBOHandlerOptions[model.Clients, rawClientData, *Client]{
@@ -58,13 +56,20 @@ var clientDBOHandler = dbo.NewHandler(dbo.DBOHandlerOptions[model.Clients, rawCl
 var NewClient = clientDBOHandler.New
 var NewClientFromUUID = clientDBOHandler.NewFromUUID
 
-func (client Client) ToMap() map[string]interface{} {
-	return map[string]interface{}{
-		"id":                     client.uuid,
-		"name":                   client.name,
-		"showConfirmationPrompt": client.showConfirmationPrompt,
-		"redirects":              client.redirects,
-	}
+func (client Client) GetId() uuid.UUID {
+	return client.uuid
+}
+
+func (client Client) GetName() string {
+	return client.name
+}
+
+func (client Client) GetShowConfirmationPrompt() bool {
+	return client.showConfirmationPrompt
+}
+
+func (client Client) GetRedirects() []string {
+	return client.redirects
 }
 
 func (client Client) CheckSecret(secret string) bool {
@@ -101,13 +106,12 @@ func (client *Client) UpdateShowConfirmationPrompt(showConfirmationPrompt bool) 
 	return
 }
 
-func GetAllClients() (clients []*Client) {
+func GetAllClients() (clients []*Client, err error) {
 	var clientIds []struct {
 		ID int32 `json:"id"`
 	}
-	err := postgres.SELECT(table.Clients.ID.AS("id")).FROM(table.Clients).Query(db.DB, &clientIds)
-	if err != nil {
-		panic(fmt.Errorf("error occured when fetching all client IDs: %s", err))
+	if err = postgres.SELECT(table.Clients.ID.AS("id")).FROM(table.Clients).Query(db.DB, &clientIds); err != nil {
+		return
 	}
 
 	for _, client := range clientIds {

@@ -24,3 +24,9 @@ paths:
             application/json:
               schema:
                 $ref: './common.yaml#/components/schemas/Client'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/Error'

@@ -1,7 +1,6 @@
 package oauth2
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/danielhoward-me/sso-v2/backend/internal/db/dbo"
@@ -20,15 +19,15 @@ type RefreshToken struct {
 	expires time.Time
 }
 
-func makeRefreshToken(rawRefreshToken model.RefreshTokens) (*RefreshToken, int32) {
+func makeRefreshToken(rawRefreshToken model.RefreshTokens) (refreshToken *RefreshToken, id int32, err error) {
 	client, err := NewClient(rawRefreshToken.ClientID)
 	if err != nil {
-		panic(fmt.Errorf("failed to create client object when making auth code object: %s", err))
+		return
 	}
 
 	user, err := user.New(rawRefreshToken.UserID)
 	if err != nil {
-		panic(fmt.Errorf("failed to create user object when making auth code object: %s", err))
+		return
 	}
 
 	return &RefreshToken{
@@ -38,7 +37,7 @@ func makeRefreshToken(rawRefreshToken model.RefreshTokens) (*RefreshToken, int32
 		user:    user,
 		created: rawRefreshToken.Created,
 		expires: rawRefreshToken.Expires,
-	}, rawRefreshToken.ID
+	}, rawRefreshToken.ID, nil
 }
 
 var RefreshTokenDBOHandler = dbo.NewHandler(dbo.DBOHandlerOptions[model.RefreshTokens, model.RefreshTokens, *RefreshToken]{
