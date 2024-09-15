@@ -5,30 +5,22 @@ info:
   version: 0.0.0
 
 servers:
-  - url: https://sso-internal.danielhowarad.me/api
+  - url: http://sso-internal.danielhowarad.me/api
 
 paths:
-  /clients:
+  /client/{id}:
     get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      format: uuid
-                    name:
-                      type: string
-                    showConfirmationPrompt:
-                      type: boolean
-                    redirects:
-                      type: array
-                      items:
-                        type: string
-                        format: uri
+                $ref: './common.yaml#/components/schemas/Client'

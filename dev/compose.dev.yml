@@ -21,11 +21,17 @@ services:
     develop:
       watch:
         - action: sync+restart
+          x-initialSync: true
           path: ./../backend
+          ignore:
+            - ./../backend/go.mod
           target: /app
         - action: rebuild
+          x-initialSync: true
           path: ./../backend/go.mod
   proxy:
+    depends_on:
+      - backend
     image: nginx:1.25.2
     ports:
       - 80:80

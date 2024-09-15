@@ -2,6 +2,9 @@ FROM golang:1.23.1-alpine
 
 WORKDIR /app
 
+RUN apk add nodejs npm
+RUN npm install -g @redocly/cli@latest
+
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .

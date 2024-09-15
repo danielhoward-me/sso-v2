@@ -1,0 +1,17 @@
+components:
+  schemas:
+    Client:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        showConfirmationPrompt:
+          type: boolean
+        redirects:
+          type: array
+          items:
+            type: string
+            format: uri
