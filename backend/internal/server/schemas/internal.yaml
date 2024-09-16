@@ -1,14 +1,14 @@
 openapi: 3.0.3
 
 info:
-  title: SSO Internal API
+  title: Internal API
   version: 0.0.0
 
 servers:
-  - url: http://sso-internal.danielhowarad.me/api
+  - url: http://sso-backend:80/api
 
 paths:
-  /client/{id}:
+  /clients/{id}:
     get:
       parameters:
         - name: id
@@ -24,6 +24,12 @@ paths:
             application/json:
               schema:
                 $ref: './common.yaml#/components/schemas/Client'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorWithDetails'
         '404':
           description: Not Found
           content:

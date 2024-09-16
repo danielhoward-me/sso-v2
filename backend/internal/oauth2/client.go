@@ -106,6 +106,33 @@ func (client *Client) UpdateShowConfirmationPrompt(showConfirmationPrompt bool) 
 	return
 }
 
+func (client *Client) UpdateRedirects(redirects []string) (err error) {
+	_, err = table.ClientRedirects.DELETE().WHERE(table.ClientRedirects.ClientID.EQ(postgres.Int32(client.id))).Exec(db.DB)
+	if err != nil {
+		return
+	}
+
+	client.redirects = []string{}
+
+	if len(redirects) == 0 {
+		return
+	}
+
+	insertStatement := table.ClientRedirects.INSERT(table.ClientRedirects.AllColumns)
+	for _, redirect := range redirects {
+		insertStatement = insertStatement.MODEL(model.ClientRedirects{
+			ClientID: client.id,
+			Redirect: redirect,
+		})
+	}
+	if _, err = insertStatement.Exec(db.DB); err != nil {
+		return
+	}
+
+	client.redirects = redirects
+	return
+}
+
 func GetAllClients() (clients []*Client, err error) {
 	var clientIds []struct {
 		ID int32 `json:"id"`

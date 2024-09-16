@@ -19,3 +19,38 @@ paths:
                 type: array
                 items:
                   $ref: './common.yaml#/components/schemas/Client'
+  /admin/clients/{id}:
+    put:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './common.yaml#/components/schemas/MutableClient'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ActionSuccess'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/ErrorWithDetails'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yaml#/components/schemas/Error'
+

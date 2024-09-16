@@ -35,9 +35,9 @@ func main() {
 	fmt.Println("Connected to database")
 
 	apiOptions := server.Options{
-		AccountHostname:     utils.RequireEnv("ACCOUNT_HOSTNAME"),
-		SsoHostname:         utils.RequireEnv("SSO_HOSTNAME"),
-		SsoInternalHostname: utils.RequireEnv("SSO_INTERNAL_HOSTNAME"),
+		AccountHostname:  utils.RequireEnv("ACCOUNT_HOSTNAME"),
+		InternalHostname: utils.RequireEnv("INTERNAL_HOSTNAME"),
+		SsoHostname:      utils.RequireEnv("SSO_HOSTNAME"),
 	}
 
 	alerter, exists := getAlerter()

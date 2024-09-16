@@ -1,5 +1,12 @@
 components:
   schemas:
+    ActionSuccess:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
     Error:
       type: object
       required:
@@ -10,17 +17,29 @@ components:
           type: integer
         message:
           type: string
-    Client:
+    ErrorDetail:
       type: object
       required:
-        - id
-        - name
-        - showConfirmationPrompt
-        - redirects
+        - message
       properties:
-        id:
+        message:
           type: string
-          format: uuid
+        input:
+          type: string
+    ErrorWithDetails:
+      allOf:
+        - $ref: '#/components/schemas/Error'
+        - type: object
+          required:
+            - details
+          properties:
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/ErrorDetail'
+    MutableClient:
+      type: object
+      properties:
         name:
           type: string
         showConfirmationPrompt:
@@ -30,3 +49,16 @@ components:
           items:
             type: string
             format: uri
+    Client:
+      allOf:
+        - $ref: '#/components/schemas/MutableClient'
+        - type: object
+          required:
+            - id
+            - name
+            - showConfirmationPrompt
+            - redirects
+          properties:
+            id:
+              type: string
+              format: uuid

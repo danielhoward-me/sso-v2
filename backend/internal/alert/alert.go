@@ -41,7 +41,7 @@ func getTitle() string {
 	return fmt.Sprintf("%s on %s", baseTitle, hostname)
 }
 
-func (alerter *Alerter) Alert(message string) {
+func (alerter Alerter) Alert(message string) {
 	fullMessage := fmt.Sprintf("%s%s", getDevMessage(), message)
 	alerter.sender.Send(fullMessage, defaultParams)
 }
