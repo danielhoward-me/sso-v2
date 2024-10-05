@@ -4,9 +4,11 @@ WORKDIR /app
 
 RUN apk add nodejs npm
 RUN npm install -g @redocly/cli@latest
+RUN apk add bash
 
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 
-CMD ["go", "run", "./cmd/sso-backend"]
+RUN bash -c "sh ./make-run-file.sh"
+CMD ["bash", "./run.sh"]

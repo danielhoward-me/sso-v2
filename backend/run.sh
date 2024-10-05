@@ -1,0 +1,1 @@
+echo "WARNING:" && echo " - Starting image with sleep command due to missing generator files" && echo " - Please keep this running and run \`make backend-generate\` in another terminal" && echo " - Then restart this one with \`make dev-build\`" && sleep 999
