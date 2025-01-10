@@ -32,9 +32,23 @@ services:
         - action: rebuild
           x-initialSync: true
           path: ./../backend/go.mod
+  frontend:
+    build:
+      context: ./../frontend
+      dockerfile: Dockerfile.dev
+    env_file:
+      - path : ./../frontend.env
+        required: false
+    develop:
+      watch:
+        - action: sync
+          x-initialSync: true
+          target: /app
+          path: ./../frontend
   proxy:
     depends_on:
       - backend
+      - frontend
     image: nginx:1.25.2
     ports:
       - 3000:3000
