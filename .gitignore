@@ -2,3 +2,4 @@
 *.gen.go
 *.gen.yaml
 node_modules/
+.next/
